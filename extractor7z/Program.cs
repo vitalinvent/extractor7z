@@ -11,19 +11,26 @@ namespace extractor7z
         static void Main(string[] args)
         {
             //to debug
-            //args = new string[3] { "*.7z", "exclude", "japan,china" };
+            //args = new string[4] { "d:\\temp\\*.zip", "exclude", "japan,china,corea,(J)" , "G:\\GAMES\\NDS"};
             SevenZip.SevenZipExtractor.SetLibraryPath(@"7z.dll");
             SevenZip.SevenZipExtractor zip;
             ulong size = 0;
             int idx = 0;
             string name = "";
             string[] arrExclude = null;
-            if (!Directory.Exists("extracted")) Directory.CreateDirectory("extracted");
+            string pathExtractTo = "";
             if (args.Length > 0)
             {
                 try
                 {
-                    string[] files = Directory.GetFiles(Directory.GetCurrentDirectory(), args[0]);
+                    string[] files = null;
+                    if (Path.GetDirectoryName(args[0]).Length == 0)
+                    {
+                        files = Directory.GetFiles(Directory.GetCurrentDirectory(), args[0]);
+                    } else
+                    {
+                        files = Directory.GetFiles(Path.GetDirectoryName(args[0]), Path.GetFileName(args[0]));
+                    }
                     //string[] files = Directory.GetFiles("X:\\temp ", "1.7z ");
                     Console.WriteLine("Found " + files.Length + " files");
                     int countArchivesExtracted = 0;
@@ -33,6 +40,21 @@ namespace extractor7z
                         {
                             arrExclude = args[2].Split(',');
                         }
+                    }
+                    if (args.Length > 3)
+                    {
+                        try {
+                            if (!Directory.Exists(args[3] + "\\extracted"))
+                            {
+                                Directory.CreateDirectory(args[3] + "\\extracted");
+                            }
+                        } finally { }
+                        pathExtractTo = args[3] + "\\extracted";
+                    }
+                    else
+                    {
+                        if (!Directory.Exists(Directory.GetCurrentDirectory() + "\\extracted")) Directory.CreateDirectory(Directory.GetCurrentDirectory() + "\\extracted");
+                        pathExtractTo = Directory.GetCurrentDirectory() + "\\extracted";
                     }
                     foreach (string file in files)
                     {
@@ -77,10 +99,10 @@ namespace extractor7z
 
                                 //using (FileStream fs = File.OpenWrite(Directory.))
                             }
-                            string fileExtractTo = Directory.GetCurrentDirectory() + "\\extracted\\" + name;
-                            using (FileStream fs = new FileStream(fileExtractTo, FileMode.Create))
+                            string fileExtractTo = pathExtractTo + "\\" + name;
+                            if (!File.Exists(fileExtractTo))
                             {
-                                if (!File.Exists(fileExtractTo))
+                                using (FileStream fs = new FileStream(fileExtractTo, FileMode.Create))
                                 {
                                     Console.Write("\r {0} of {1} Archive: {2} File: {3}", (countArchivesExtracted + 1).ToString(), files.Length.ToString(), file, name);
                                     zip.ExtractFile(idx, fs);
@@ -104,7 +126,7 @@ namespace extractor7z
             }
             else
             {
-                Console.WriteLine("Usage: extractor [mask] [exclude string1,string2,string3] - extract one largest file from archive files by mask in dir , exclude string in name (get next one)");
+                Console.WriteLine("Usage: extractor [mask] [exclude string1,string2,string3] [path to extract] - extract one largest file from archive files by mask in dir , exclude string in name (get next one)");
                 //Application.Run(new Form1());
             }
         }
