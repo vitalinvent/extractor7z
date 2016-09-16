@@ -10,6 +10,8 @@ namespace extractor7z
     {
         static void Main(string[] args)
         {
+            //to debug
+            //args = new string[3] { "*.7z", "exclude", "japan,china" };
             SevenZip.SevenZipExtractor.SetLibraryPath(@"7z.dll");
             SevenZip.SevenZipExtractor zip;
             ulong size = 0;
@@ -38,18 +40,19 @@ namespace extractor7z
                         size = 0;
                         idx = 0;
                         name = "";
-                        ReadOnlyCollection<SevenZip.ArchiveFileInfo> infos = zip.ArchiveFileData;
-                        foreach (SevenZip.ArchiveFileInfo info in infos)
+                        //ReadOnlyCollection<SevenZip.ArchiveFileInfo> infos = ;
+                        foreach (SevenZip.ArchiveFileInfo info in zip.ArchiveFileData)
                         {
+                            string fileName =info.FileName;
                             bool exist = false;
                             foreach (string exclude in arrExclude)
                             {
-                                if (info.FileName.IndexOf(exclude) > 0) exist = true;
+                                if (fileName.ToLower().IndexOf(exclude.ToLower()) > 0) exist = true;
                             }
-                            if ((size < info.Size) & (exist = false))
+                            if ((size < info.Size) & (exist == false))
                             {
                                 idx = info.Index;
-                                name = info.FileName;
+                                name = fileName;
                             }
 
                         }
