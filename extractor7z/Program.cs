@@ -77,11 +77,15 @@ namespace extractor7z
 
                                 //using (FileStream fs = File.OpenWrite(Directory.))
                             }
-                            using (FileStream fs = new FileStream(Directory.GetCurrentDirectory() + "\\extracted\\" + name, FileMode.Create))
+                            string fileExtractTo = Directory.GetCurrentDirectory() + "\\extracted\\" + name;
+                            using (FileStream fs = new FileStream(fileExtractTo, FileMode.Create))
                             {
-                                Console.Write("\r {0} of {1} Archive: {2} File: {3}", (countArchivesExtracted + 1).ToString(), files.Length.ToString(), file, name);
-                                zip.ExtractFile(idx, fs);
-                                countArchivesExtracted++;
+                                if (!File.Exists(fileExtractTo))
+                                {
+                                    Console.Write("\r {0} of {1} Archive: {2} File: {3}", (countArchivesExtracted + 1).ToString(), files.Length.ToString(), file, name);
+                                    zip.ExtractFile(idx, fs);
+                                    countArchivesExtracted++;
+                                }
                             }
                         }
                         catch (Exception ex)
